@@ -14,6 +14,10 @@ from django.conf.urls.static import static
 from pathlib import Path
 from django.conf import settings
 import os
+import pymysql
+
+
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
