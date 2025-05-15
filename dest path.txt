@@ -1,4 +1,0 @@
-/home4/paradoy9/repositories/Parser-Utility
-
-
-Use Railway with PlanetScale + Cloudinary (Recommended Free Setup)
