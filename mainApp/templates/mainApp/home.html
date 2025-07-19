@@ -1,0 +1,659 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'mainApp/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+            integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+.hidden {
+    display: none !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+#loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 30, 30, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #6dc6c3;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 15%;
+    min-width: 200px;
+    background-color: #6dc6c3;
+    color: #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; 
+}
+
+.sidebar h3 {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center; /* center the heading text */
+    margin-bottom: 15px;
+}
+
+.project-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.project-list li,
+.new-project-btn,
+.logout-btn {
+    padding: 10px 20px;
+    margin-top: 3px; /* reduce top margin */
+    margin-bottom: 0; /* remove any bottom margin */
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    border-left: 3px solid transparent;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+    display: block;
+    color: #333;
+    font-family: inherit;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.project-list li:hover,
+.new-project-btn:hover,
+.logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.project-list li.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-left: 3px solid #333;
+}
+
+.new-project-btn i,
+.logout-btn i {
+    margin-right: 8px;
+}
+
+
+/* Main content styles */
+.main-content {
+    flex-grow: 1;
+    padding: 0;
+    background-color: white;
+}
+
+.navbar {
+    padding: 15px 20px;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.navbar a {
+    text-decoration: none; /* removes underline */
+    color: #333; /* sets the hyperlink color to black */
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    font-weight: 500;
+}
+
+.dashboard-content {
+    padding: 20px;
+}
+
+.dashboard-content h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* File details styles */
+.file-details {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.file-details h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.file-section h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.file-section h4 i {
+    margin-right: 8px;
+}
+
+.file-section a {
+    display: block;
+    color: #0066cc;
+    text-decoration: none;
+    padding: 5px 0;
+    margin-left: 5px;
+}
+
+.file-section a:hover {
+    text-decoration: underline;
+}
+
+/* New project form */
+/* Updated styling for new project form */
+.new-project-form {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.new-project-form h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.new-project-form h3 i {
+    margin-right: 10px;
+}
+
+.input-group {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    width: 100%;  /* Ensure the inputs stretch across */
+}
+
+.input-group i {
+    margin-right: 10px;
+    color: #666;
+}
+
+.input-field {
+    padding: 8px 12px; /* standardize padding for inputs */
+    height: 36px; /* make the height consistent */
+    line-height: 22px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    flex-grow: 1;
+    font-size: 14px;
+    box-sizing: border-box; /* ensures proper width calculation */
+}
+
+.choose-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    width: 100%;  /* Ensure file upload aligns */
+}
+
+.upload-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    background-color: white;
+    color: black;
+    padding: 8px 12px; /* Ensure consistent padding with inputs */
+    height: 36px; /* Ensure consistent height */
+    line-height: 22px;
+    border-radius: 4px;
+    flex-grow: 1;
+    border: none; /* Removed border */
+    font-size: 14px;
+    box-sizing: border-box; /* aligns with input fields */
+}
+
+.upload-label:hover {
+    background-color: white; /* Ensure it stays white on hover */
+    color: black; /* Keep text color black */
+}
+
+
+.choose-file i {
+    margin-right: 10px;
+    color: #666;
+}
+
+#fileName {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.upload-btn, .download-btn {
+    padding: 8px 16px; /* consistent padding for buttons */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.upload-btn {
+    background-color: #6dc6c3;
+    color: white;
+}
+
+.download-btn {
+    background-color: #fc9bb5;
+    color: white;
+}
+
+.upload-btn i, .download-btn i {
+    margin-right: 6px;
+}
+
+.upload-btn:hover {
+    background-color: #4ba19e;
+}
+
+.download-btn:hover {
+    background-color: #D97890;
+}
+
+    </style>
+</head>
+<body>
+    <div id="loader-overlay" style="display: none;">
+    	<div class="loader"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>History</h3>
+            <ul class="project-list" id="upload-history">
+        	{% for upload in uploads %}
+        	<li class="upload-item" data-name="{{ upload.name }}" data-id="{{ upload.id }}" data-input="{{ upload.input_file.url }}" data-output="{{ upload.output_file.url }}">
+            	    {{ upload.name }}
+        	</li>
+        	{% endfor %}
+    	    </ul>
+
+	    <button class="new-project-btn">
+    		<i class="fa fa-plus"></i> New Upload
+	    </button>
+
+	    <button class="logout-btn" onclick="logout()">
+    		<i class="fa fa-sign-out"></i> Logout
+	    </button>
+
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-right">
+		    <a href="{% url 'mainApp:user_management' %}">
+                    	<span class="user-name">
+			    <i class="fas fa-user-circle"></i>
+			    {{ username }}
+		    	</span>
+		    </a>
+                </div>
+            </nav>
+            
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <h2>Dashboard</h2>
+		<div id="alert-container" class="alert-placeholder mt-3"></div>
+		{% if messages %}
+    		    <div class="container mt-3">
+        	    	{% for message in messages %}
+        		    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            		    	{{ message }}
+            		    	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        		    </div>
+        	   	{% endfor %}
+    		    </div>
+    	    	{% endif %}
+		<!-- File Details Section -->
+		<div class="file-details hidden">
+    		    <h3 id="input-file"></h3>
+		    
+		    <div class="download-section">
+        		<span class="download-input">
+            		    <i class='fas fa-arrow-circle-up'></i>
+            		    <strong>Input Files</strong>
+        		</span>
+			<br><br>
+        		<a id="input-file-url" href="#">Download Input File</a>
+    		    </div>
+			
+	   	    <br><br><br><br>
+	
+    		    <div class="download-section">
+        		<span class="download-output">
+            		    <i class='fas fa-arrow-circle-down'></i>
+            		    <strong>Output Files</strong>
+        		</span>
+			<br><br>
+        		<a id="output-file-url" href="#">Download Output File</a>
+    		   </div>
+		</div>
+                
+                <!-- New Project Form -->
+                <div class="new-project-form" id="new-project-form">
+                    <h3><i class="fa-solid fa-folder-plus"></i> New Upload </h3>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <input id="file_name" type="text" placeholder="Enter Upload Name" class="input-field" required />
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-file-code"></i>
+                        <select class="input-field file-format" id="file-format" required>
+                            <option value="">Select file format</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="flatfile">Flat File</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-exchange-alt"></i>
+                        <select class="input-field convert-to" id="convert-to" disabled required>
+                            <option value="">Convert to</option>
+                        </select>
+                    </div>
+
+		     
+		    <div class="choose-file">
+    			<i class="fa-solid fa-upload upload-icon"></i>
+    
+    			<label class="upload-label">
+        		<input type="file" class="file-upload" onchange="document.getElementById('fileName').textContent = this.files[0]?.name || 'No file chosen';" required>
+			
+    			</label>
+                
+		    </div>
+
+
+                    <div class="btn-group">
+                        <button type="submit" class="upload-btn"><i class="fa-solid fa-cloud-upload"></i> Upload and Convert</button>
+                        <button class="download-btn" id="download-btn" disabled><i class="fa-solid fa-download"></i> Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showAlert(message, type) {
+        const alertContainer = document.getElementById("alert-container");
+        
+        // Create alert element
+        alertContainer.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+            
+        // Initialize the new alert
+        var alert = document.querySelector('#alert-container .alert');
+        new bootstrap.Alert(alert);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileDetails = document.querySelector(".file-details");
+        const newProjectForm = document.getElementById("new-project-form");
+        const newUploadBtn = document.querySelector(".new-project-btn");
+        const fileFormatSelect = document.getElementById("file-format");
+        const convertToSelect = document.getElementById("convert-to");
+        const uploadBtn = document.querySelector(".upload-btn");
+        const downloadBtn = document.getElementById("download-btn");
+        const fileInput = document.querySelector(".file-upload");
+        const fileNameDisplay = document.getElementById("fileName");
+        const uploadHistoryList = document.getElementById("upload-history");
+
+        // Function to attach event listeners to upload history items
+        function attachUploadItemListeners() {
+            document.querySelectorAll(".upload-item").forEach(item => {
+                item.addEventListener("click", function () {
+                    let uploadName = this.dataset.name;
+                    let uploadId = this.dataset.id;
+                    let inputFile = this.dataset.input;
+                    let outputFile = this.dataset.output;
+
+                    document.getElementById("input-file").textContent = uploadName;
+
+                    const inputLink = document.getElementById("input-file-url");
+                    inputLink.href = "/download/input/" + uploadId + "/";
+                    inputLink.textContent = inputFile.split("/").pop();
+
+                    const outputLink = document.getElementById("output-file-url");
+                    outputLink.href = "/download/output/" + uploadId + "/";
+                    outputLink.textContent = outputFile.split("/").pop();
+
+                    fileDetails.classList.remove("hidden");
+                    newProjectForm.classList.add("hidden");
+                });
+            });
+        }
+
+        // Initially attach event listeners to upload items
+        attachUploadItemListeners();
+
+        // Show new project form by default (removing the hidden class)
+        newProjectForm.classList.remove("hidden");
+
+        // Handle format change to update conversion options
+        fileFormatSelect.addEventListener("change", function () {
+            let selectedFormat = this.value;
+            convertToSelect.innerHTML = "<option value=''>Convert to</option>";
+            convertToSelect.disabled = false;
+
+            if (selectedFormat === "json" || selectedFormat === "xml") {
+                convertToSelect.innerHTML += "<option value='flatfile'>Flat File</option>";
+            } else if (selectedFormat === "flatfile") {
+                convertToSelect.innerHTML += "<option value='json'>JSON</option>";
+                convertToSelect.innerHTML += "<option value='xml'>XML</option>";
+            } else {
+                convertToSelect.disabled = true;
+            }
+        });
+
+        // Show upload form when "New Upload" button is clicked
+        newUploadBtn.addEventListener("click", function () {
+            // Always show the form and hide file details
+            newProjectForm.classList.remove("hidden");
+            fileDetails.classList.add("hidden");
+	    window.location.href = `{% url 'mainApp:home' %}`;
+        });
+
+        // Display selected file name
+        fileInput.addEventListener("change", function () {
+            fileNameDisplay.textContent = this.files[0]?.name || "No file chosen";
+        });
+
+        // Function to update just the sidebar content
+        function updateSidebar() {
+            fetch("{% url 'mainApp:get_uploads' %}", {
+                method: "GET",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the sidebar with new data
+                    let uploadsHtml = '';
+                    data.uploads.forEach(upload => {
+                        uploadsHtml += `<li class="upload-item" data-name="${upload.name}" data-id="${upload.id}" data-input="${upload.input_file_url}" data-output="${upload.output_file_url}">
+                            ${upload.name}
+                        </li>`;
+                    });
+                    uploadHistoryList.innerHTML = uploadsHtml;
+                    
+                    // Re-attach event listeners to the new items
+                    attachUploadItemListeners();
+                } else {
+                    console.error("Failed to update sidebar:", data.message);
+                }
+            })
+            .catch(error => console.error("Error updating sidebar:", error));
+        }
+
+        // Handle file upload
+        uploadBtn.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            let formData = new FormData();
+            let selectedFormat = fileFormatSelect.value;
+            let convertTo = convertToSelect.value;
+
+            if (!fileInput.files.length || !selectedFormat || !convertTo) {
+                showAlert("Please select a file and conversion options.", "warning");
+                return;
+            }
+
+            formData.append("file_name", document.querySelector("input[placeholder='Enter Upload Name']").value);
+            formData.append("file", fileInput.files[0]);
+            formData.append("file_format", selectedFormat);
+            formData.append("convert_to", convertTo);
+
+	    document.getElementById("loader-overlay").style.display = "flex";
+
+            fetch("{% url 'mainApp:upload_and_convert' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": getCSRFToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+		document.getElementById("loader-overlay").style.display = "none";
+                if (data.success) {
+                    showAlert("File converted successfully!", "success");
+                    downloadBtn.disabled = false;
+
+                    downloadBtn.onclick = function () {
+                        const downloadUrl = `/download/output/${data.upload_id}/`;
+                        window.location.href = downloadUrl;
+                    };
+
+                    // Update just the sidebar instead of refreshing the whole page
+                    updateSidebar();
+                } else {
+                    showAlert("Error: " + data.message, "danger");
+                }
+            })
+            .catch(error => {
+		document.getElementById("loader-overlay").style.display = "none";
+		showAlert("Error: " + error, "danger");
+	    });
+        });
+
+        // Logout function
+        window.logout = function () {
+            fetch("{% url 'authApp:logout' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = "{% url 'authApp:login' %}";
+                }
+            })
+            .catch(error => console.error("Logout failed:", error));
+        };
+
+        // CSRF token fetcher
+        function getCSRFToken() {
+            return document.querySelector("[name=csrfmiddlewaretoken]").value;
+        }
+    });
+    </script>
+
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</body>
+</html>
