@@ -20,3 +20,7 @@ Parser Utility is a Django web application designed to streamline the conversion
    Logged-in users can manage their own profile information, including updating their name, password, and company name.
 
 ## Tech Stack
+
+1. Frontend: HTML, CSS, JavaScript
+2. Backend: Django
+3. Database: MySQL
