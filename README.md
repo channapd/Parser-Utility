@@ -28,7 +28,26 @@ Parser Utility is a Django web application designed to streamline the conversion
 ## Installation
 
 1) Clone the repository
+   
    ```
    git clone https://github.com/channapd/Parser-Utility.git
+   ```
+
+2) Navigate to the project folder
+
+   ```
+   cd Parser-Utility-main
+   ```
+
+3) Install dependencies
+
+   ```
+   pip install -r requirements.txt
+   ```
+
+4) Run the application
+
+   ```
+   python manage.py runserver
    ```
 
