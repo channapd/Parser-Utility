@@ -24,3 +24,10 @@ Parser Utility is a Django web application designed to streamline the conversion
 1. Frontend: HTML, CSS, JavaScript
 2. Backend: Django
 3. Database: MySQL
+
+## Installation
+
+1) Clone the repository
+   '''
+   git clone https://github.com/channapd/Parser-Utility.git
+   '''
