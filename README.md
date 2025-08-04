@@ -48,7 +48,7 @@ Parser Utility is a Django web application designed to streamline the conversion
 
 4) Add API Keys
 
-   Create a .env file and add the AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_REGION_NAME, DJANGO_SECRET_KEY
+   Create a .env file and add your AWS credentials
 
 
 6) Run the application
