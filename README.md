@@ -52,6 +52,8 @@ Parser Utility is a Django web application designed to streamline the conversion
 
 
 6) Run the application
+   
+   Open a terminal in the directory where manage.py is located, and run
 
    ```
    python manage.py runserver
