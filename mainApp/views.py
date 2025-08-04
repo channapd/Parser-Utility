@@ -230,7 +230,7 @@ def upload_and_convert(request):
 
             return JsonResponse({
                 "success": True, 
-                "message": "File converted and uploaded to S3 successfully", 
+                "message": "File converted successfully", 
                 "upload_id": upload.id,
                 "s3_url": s3_url
             })
